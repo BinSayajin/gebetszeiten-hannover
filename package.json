@@ -1,7 +1,7 @@
 {
   "name": "gebetszeiten-hannover",
   "productName": "Gebetszeiten Hannover",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Ein lokales Desktop-Widget für die Gebetszeiten in Hannover.",
   "private": true,
   "main": "src/main.cjs",

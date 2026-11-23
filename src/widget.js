@@ -7,6 +7,7 @@ const sourceLabels = {
   annual: ['Jahreskalender', 'Gebetszeiten aus dem Offline-Jahreskalender'],
 };
 
+let currentKey;
 let rowKey;
 
 function duration(minutes) {
@@ -14,6 +15,24 @@ function duration(minutes) {
   const remainder = minutes % 60;
   if (!hours) return `in ${remainder} Min.`;
   return `in ${hours} Std.${remainder ? ` ${remainder} Min.` : ''}`;
+}
+
+function renderCurrent({ current, source, requesting }) {
+  const prayer = source ? current : null;
+  const name = prayer?.name ?? (source ? 'Gebetspause' : requesting ? 'Lade Zeiten …' : 'Keine Zeiten');
+  const time = prayer?.time ?? '';
+  const detail = prayer?.detail ?? '';
+  const key = JSON.stringify([name, time, detail]);
+  if (key === currentKey) return;
+  currentKey = key;
+
+  byId('current-name').textContent = name;
+  const clock = byId('current-time');
+  clock.textContent = time;
+  clock.dateTime = time;
+  clock.hidden = !time;
+  byId('current-detail').textContent = detail;
+  byId('current-detail').hidden = !detail;
 }
 
 function renderNext(state) {
@@ -60,6 +79,7 @@ function renderRows(rows, current, today) {
   const body = byId('prayer-rows');
   body.replaceChildren(...rows.map(prayer => {
     const row = document.createElement('tr');
+    row.dataset.prayer = prayer.id;
     const name = document.createElement('th');
     name.scope = 'row';
     name.textContent = prayer.name;
@@ -80,9 +100,11 @@ function renderRows(rows, current, today) {
 }
 
 function render(state) {
+  document.querySelector('.widget').dataset.theme = state.theme;
   const date = byId('date');
   date.dateTime = state.date;
   date.textContent = dateFormatter.format(new Date(`${state.date}T12:00:00Z`));
+  renderCurrent(state);
   renderNext(state);
   renderRows(state.rows, state.current, state.date);
   byId('schedule-table').hidden = !state.source;

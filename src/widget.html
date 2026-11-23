@@ -9,7 +9,7 @@
     <script src="widget.js" defer></script>
   </head>
   <body>
-    <main class="widget" aria-labelledby="title">
+    <main class="widget" data-theme="classic" aria-label="Gebetszeiten Hannover">
       <header class="header">
         <div class="arches" aria-hidden="true"><i></i><i></i><i></i></div>
         <div class="header-top">
@@ -22,6 +22,14 @@
         <h1 id="title">Gebetszeiten</h1>
         <time id="date" class="date"></time>
       </header>
+
+      <section class="current" aria-labelledby="current-label">
+        <h2 id="current-label" class="eyebrow">Aktuell</h2>
+        <div class="current-title" aria-live="polite" aria-atomic="true">
+          <span id="current-name">Lade Zeiten …</span><time id="current-time" hidden></time>
+          <span id="current-detail" hidden></span>
+        </div>
+      </section>
 
       <section class="next" aria-labelledby="next-label">
         <div>

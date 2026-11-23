@@ -6,7 +6,9 @@ Ein verschiebbares Desktop-Widget für Windows und macOS. Es zeigt die heutigen 
 
 - **Windows x64** – Setup-EXE öffnen und anschließend **Gebetszeiten Hannover** über die Desktop-Verknüpfung oder das Startmenü starten.
 - **macOS** – DMG für **Apple Silicon (arm64)** oder **Intel (x64)** öffnen und die App nach **Programme** ziehen. Das Projekt erstellt macOS-Pakete ohne Developer-ID-Signatur und Notarisierung.
-- Ziehe das Fenster an der Kopfzeile an die gewünschte Position. **⋯** öffnet die Optionen für **Immer im Vordergrund**, **Beim Anmelden starten** und die Asr-Methode. Das Mondsymbol im Windows-Infobereich oder in der macOS-Menüleiste holt das ausgeblendete Widget zurück. Auf macOS kann der Autostart bei einem nicht notarisierten Build ausbleiben.
+- Ziehe das Fenster an der Kopfzeile an die gewünschte Position. Ziehe einen Rand oder eine Ecke, um die Größe zu ändern. Querformat zeigt die Übersicht und die Tabelle nebeneinander. In der kleinsten Ansicht stehen das aktuelle Gebet und seine Beginnzeit.
+- Unter **⋯ → Design** kannst du zwischen **Klassisch** und **Glas** wechseln. Die App merkt sich Größe, Position und Design. Im selben Menü findest du **Immer im Vordergrund**, **Beim Anmelden starten** und die Asr-Methode.
+- Das Mondsymbol im Windows-Infobereich oder in der macOS-Menüleiste holt das ausgeblendete Widget zurück. Auf macOS kann der Autostart bei einem nicht notarisierten Build ausbleiben.
 
 ## Kalender und Hervorhebung
 
@@ -28,7 +30,7 @@ npm test
 
 Unter Windows baut `npm run dist:win -- --x64` die Setup-EXE. Unter macOS baut `npm run dist:mac -- --arm64` das DMG für Apple Silicon. Für Intel lautet das Argument `--x64`. Die Dateien liegen in `dist/`.
 
-Nach dem Push zu GitHub kannst du unter **Actions → Installationspakete bauen → Run workflow** die drei Pakete bauen lassen. Ein Push eines Tags wie `v1.0.0` startet denselben Build. Lade die Dateien aus den Workflow-Artefakten herunter und hänge sie an deinen GitHub-Release an, damit Freunde sie herunterladen können.
+Nach dem Push zu GitHub kannst du unter **Actions → Installationspakete bauen → Run workflow** die drei Pakete bauen lassen. Ein Push eines Tags wie `v1.1.0` startet denselben Build. Lade die Dateien aus den Workflow-Artefakten herunter und hänge sie an deinen GitHub-Release an, damit Freunde sie herunterladen können.
 
 ## Weiteres Jahr offline hinterlegen
 

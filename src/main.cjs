@@ -7,16 +7,18 @@ const NAME = 'Gebetszeiten Hannover';
 const APP_ID = 'app.gebetszeiten.hannover';
 const SOURCE = 'https://lichterdererkenntnis.de/#gebetszeiten';
 const API = 'https://lichterdererkenntnis.de/api/prayer-times';
+const DEFAULT_SIZE = { width: 384, height: 534 };
+const MIN_SIZE = { width: 182, height: 96 };
 const assets = path.join(__dirname, '..', 'assets');
 const calendar = new Map();
 const liveDays = new Map();
-let preferences = { method: 'asr2', pinned: false, position: null };
+const preferences = { method: 'asr2', pinned: false, theme: 'classic', position: null, size: DEFAULT_SIZE };
 let widget;
 let tray;
 let quitting = false;
 let requesting = false;
 let nextRequest = 0;
-let positionTimer;
+let boundsTimer;
 
 function readJson(filename) {
   try {
@@ -44,8 +46,13 @@ function loadData() {
   if (saved) {
     if (saved.method === 'asr1') preferences.method = saved.method;
     preferences.pinned = saved.pinned === true;
+    if (saved.theme === 'glass') preferences.theme = saved.theme;
     if (Number.isInteger(saved.position?.x) && Number.isInteger(saved.position?.y)) {
       preferences.position = saved.position;
+    }
+    const { width, height } = saved.size ?? {};
+    if (Number.isInteger(width) && width > 0 && Number.isInteger(height) && height > 0) {
+      preferences.size = { width, height };
     }
   }
 
@@ -70,6 +77,7 @@ function loadData() {
 function getState(now = Date.now()) {
   return {
     ...widgetState(now, date => liveDays.get(date) ?? calendar.get(date), preferences.method),
+    theme: preferences.theme,
     requesting,
   };
 }
@@ -115,11 +123,13 @@ async function refresh(force = false) {
   }
 }
 
-function windowBounds(position) {
-  const display = position ? screen.getDisplayNearestPoint(position) : screen.getPrimaryDisplay();
+function windowBounds(position, size) {
+  const display = position
+    ? screen.getDisplayMatching({ ...position, ...size })
+    : screen.getPrimaryDisplay();
   const area = display.workArea;
-  const width = Math.min(384, area.width);
-  const height = Math.min(534, area.height);
+  const width = Math.min(Math.max(size.width, MIN_SIZE.width), area.width);
+  const height = Math.min(Math.max(size.height, MIN_SIZE.height), area.height);
   const x = position?.x ?? area.x + area.width - width - 22;
   const y = position?.y ?? area.y + 22;
   return {
@@ -130,21 +140,38 @@ function windowBounds(position) {
   };
 }
 
-function rememberPosition() {
+function rememberBounds(resized = false) {
   if (!widget || widget.isDestroyed()) return;
-  const [x, y] = widget.getPosition();
+  const { x, y, width, height } = widget.getBounds();
   preferences.position = { x, y };
+  // Window creation can round bounds on scaled displays. Persist size only after manual resizing.
+  if (resized) preferences.size = { width, height };
   saveLocal('preferences.json', preferences);
 }
 
+function queueSaveBounds() {
+  clearTimeout(boundsTimer);
+  boundsTimer = setTimeout(rememberBounds, 250);
+}
+
+function applyWindowTheme() {
+  const glass = preferences.theme === 'glass';
+  if (process.platform === 'darwin') widget.setVibrancy(glass ? 'under-window' : null);
+  if (process.platform === 'win32') widget.setBackgroundMaterial(glass ? 'acrylic' : 'none');
+  widget.setBackgroundColor(glass ? '#00000000' : '#101f1b');
+}
+
 function createWindow() {
+  const bounds = windowBounds(preferences.position, preferences.size);
   widget = new BrowserWindow({
-    ...windowBounds(preferences.position),
+    ...bounds,
+    minWidth: MIN_SIZE.width,
+    minHeight: MIN_SIZE.height,
     title: NAME,
     icon: path.join(assets, 'app.png'),
     frame: false,
-    transparent: true,
-    resizable: false,
+    resizable: true,
+    backgroundColor: '#101f1b',
     fullscreenable: false,
     maximizable: false,
     skipTaskbar: true,
@@ -156,18 +183,20 @@ function createWindow() {
       contextIsolation: true,
     },
   });
+  applyWindowTheme();
   widget.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
   widget.webContents.on('will-navigate', event => event.preventDefault());
-  widget.on('ready-to-show', () => widget.show());
+  widget.once('ready-to-show', () => {
+    widget.setBounds(bounds);
+    widget.show();
+  });
   widget.on('show', () => {
     publishState();
     updateTrayMenu();
   });
   widget.on('hide', updateTrayMenu);
-  widget.on('move', () => {
-    clearTimeout(positionTimer);
-    positionTimer = setTimeout(rememberPosition, 250);
-  });
+  widget.on('move', queueSaveBounds);
+  widget.on('resized', () => rememberBounds(true));
   widget.on('close', event => {
     if (quitting) return;
     event.preventDefault();
@@ -190,6 +219,15 @@ function chooseMethod(method) {
   updateTrayMenu();
 }
 
+function chooseTheme(theme) {
+  if (theme === preferences.theme) return;
+  preferences.theme = theme;
+  applyWindowTheme();
+  saveLocal('preferences.json', preferences);
+  publishState();
+  updateTrayMenu();
+}
+
 function openSource() {
   return shell.openExternal(SOURCE);
 }
@@ -199,6 +237,13 @@ function menuTemplate() {
   const items = [
     { label: widget.isVisible() ? 'Widget ausblenden' : 'Widget anzeigen', click: toggleVisibility },
     { label: 'Immer im Vordergrund', type: 'checkbox', checked: preferences.pinned, click: togglePinned },
+    {
+      label: 'Design',
+      submenu: [
+        { label: 'Klassisch', type: 'radio', checked: preferences.theme === 'classic', click: () => chooseTheme('classic') },
+        { label: 'Glas', type: 'radio', checked: preferences.theme === 'glass', click: () => chooseTheme('glass') },
+      ],
+    },
     {
       label: 'Asr für die Hervorhebung',
       submenu: [
@@ -270,8 +315,8 @@ if (!app.requestSingleInstanceLock()) {
   app.on('activate', () => widget?.show());
   app.on('before-quit', () => {
     quitting = true;
-    clearTimeout(positionTimer);
-    rememberPosition();
+    clearTimeout(boundsTimer);
+    rememberBounds();
   });
   app.whenReady().then(() => {
     loadData();
@@ -289,8 +334,11 @@ if (!app.requestSingleInstanceLock()) {
     timer.unref();
     powerMonitor.on('resume', () => void refresh(true));
     const fitToDisplay = () => {
-      const [x, y] = widget.getPosition();
-      widget.setBounds(windowBounds({ x, y }));
+      const { x, y, width, height } = widget.getBounds();
+      const bounds = windowBounds({ x, y }, { width, height });
+      if (bounds.x !== x || bounds.y !== y || bounds.width !== width || bounds.height !== height) {
+        widget.setBounds(bounds);
+      }
     };
     screen.on('display-removed', fitToDisplay);
     screen.on('display-metrics-changed', fitToDisplay);
