@@ -1,0 +1,49 @@
+name: Installationspakete bauen
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: windows-2025
+            platform: win
+            arch: x64
+            extension: exe
+          - runner: macos-15
+            platform: mac
+            arch: arm64
+            extension: dmg
+          - runner: macos-15-intel
+            platform: mac
+            arch: x64
+            extension: dmg
+    runs-on: ${{ matrix.runner }}
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run dist:${{ matrix.platform }} -- --${{ matrix.arch }}
+      - uses: actions/upload-artifact@v7
+        with:
+          name: gebetszeiten-${{ matrix.platform }}-${{ matrix.arch }}
+          path: dist/Gebetszeiten-Hannover-*.${{ matrix.extension }}
+          if-no-files-found: error
+          compression-level: 0

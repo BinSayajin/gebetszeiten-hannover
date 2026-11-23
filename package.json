@@ -1,0 +1,28 @@
+{
+  "name": "gebetszeiten-hannover",
+  "productName": "Gebetszeiten Hannover",
+  "version": "1.0.0",
+  "description": "Ein lokales Desktop-Widget für die Gebetszeiten in Hannover.",
+  "private": true,
+  "main": "src/main.cjs",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test",
+    "dist:win": "electron-builder --win nsis --publish never",
+    "dist:mac": "electron-builder --mac dmg --publish never"
+  },
+  "devDependencies": {
+    "electron": "45.4.1",
+    "electron-builder": "26.18.0"
+  },
+  "build": {
+    "appId": "app.gebetszeiten.hannover",
+    "artifactName": "Gebetszeiten-Hannover-${version}-${os}-${arch}.${ext}",
+    "directories": { "output": "dist" },
+    "files": ["src/**/*", "data/hannover-*.json", "assets/**/*"],
+    "win": { "icon": "assets/app.png" },
+    "mac": { "icon": "assets/app.png", "category": "public.app-category.utilities" },
+    "nsis": { "createDesktopShortcut": true, "createStartMenuShortcut": true }
+  }
+}

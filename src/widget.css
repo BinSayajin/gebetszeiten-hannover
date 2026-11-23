@@ -1,0 +1,116 @@
+:root {
+  color-scheme: dark;
+  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 13px;
+  color: #ecf0e8;
+  --muted: #a7beb2;
+  --dim: #91aca0;
+  --accent: #f1d29a;
+  --line: #28453c;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; }
+button { font: inherit; color: inherit; cursor: pointer; -webkit-app-region: no-drag; }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.widget {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0 19px;
+  border: 1px solid #395a4c;
+  border-radius: 21px;
+  background: radial-gradient(ellipse at 87% 0%, #1d4234 0%, transparent 48%), #101f1b;
+}
+
+.header { position: relative; padding: 15px 0 14px; -webkit-app-region: drag; user-select: none; }
+.header-top { display: flex; align-items: center; justify-content: space-between; position: relative; }
+.location { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 650; color: #c8ddd0; }
+.location img { border-radius: 9px; }
+.controls { display: flex; gap: 5px; }
+.icon-button {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 29px;
+  padding: 0;
+  border: 1px solid #ffffff21;
+  border-radius: 8px;
+  background: #11251eaa;
+  color: #d4e3da;
+}
+.icon-button:hover { background: #345345; }
+.dots { width: 3px; height: 3px; border-radius: 50%; background: currentColor; box-shadow: -5px 0 currentColor, 5px 0 currentColor; }
+.minus { width: 10px; height: 1.5px; border-radius: 2px; background: currentColor; }
+
+.arches { position: absolute; width: 134px; height: 120px; right: 11px; bottom: 0; overflow: hidden; pointer-events: none; }
+.arches i { position: absolute; left: 0; right: 0; margin: auto; border: 1px solid #b2b6892f; border-radius: 50% 50% 0 0 / 51% 51% 0 0; border-bottom: 0; }
+.arches i:nth-child(1) { width: 128px; height: 139px; top: 23px; }
+.arches i:nth-child(2) { width: 100px; height: 120px; top: 37px; }
+.arches i:nth-child(3) { width: 72px; height: 101px; top: 51px; }
+
+h1 { position: relative; margin: 8px 0 3px; font: 400 37px/1.03 Georgia, serif; letter-spacing: -1.4px; color: #f7f0e0; }
+.date { position: relative; display: block; min-height: 17px; color: var(--muted); font-size: 12px; }
+
+.next {
+  flex: 0 0 auto;
+  min-height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 9px 12px;
+  border: 1px solid #9f89577a;
+  border-radius: 12px;
+  background: linear-gradient(110deg, #3c3827, #2a3125 84%);
+}
+.eyebrow { margin: 0 0 4px; color: #eed096; font-size: 10px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; }
+.next-title { display: flex; align-items: baseline; gap: 8px; white-space: nowrap; }
+#next-name { color: #f9edcf; font: 400 25px/1.02 Georgia, serif; }
+.next-time { color: #e7dcb9; font-size: 12px; font-variant-numeric: tabular-nums; }
+.countdown { margin: 0; color: #f1dfb7; font-size: 12px; font-weight: 600; text-align: right; line-height: 1.35; }
+
+.schedule { flex: 1; min-height: 0; margin-top: 9px; overflow: auto; scrollbar-width: thin; scrollbar-color: #516b60 transparent; }
+table { width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed; }
+th, td { padding: 0 10px; text-align: right; white-space: nowrap; }
+th:first-child { width: 50%; text-align: left; }
+thead th { height: 29px; border-bottom: 1px solid var(--line); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .085em; color: var(--muted); }
+tbody th, tbody td { height: 32px; border-bottom: 1px solid #274138; }
+tbody th { font-weight: 600; }
+tbody td { color: #e1e9e0; font-size: 13px; font-variant-numeric: tabular-nums; }
+tr:last-child th, tr:last-child td { border-bottom-color: transparent; }
+.prayer-detail { margin-left: 6px; font-size: 10px; color: var(--dim); font-weight: 500; }
+.jamaah { color: #b5ccbf; }
+.missing { color: var(--dim); }
+.after-midnight { font-size: 9px; vertical-align: super; margin-left: 2px; color: var(--dim); }
+
+.active th, .active td { color: #f7e0ab; background: #453b2a; border-bottom-color: #695536; }
+.active th { border-radius: 7px 0 0 7px; box-shadow: inset 2px 0 var(--accent); }
+.active td:last-child { border-radius: 0 7px 7px 0; }
+.active .prayer-detail { color: #e5cd9e; }
+.active .missing { color: #c6b88d; }
+
+.empty { display: grid; min-height: 155px; place-content: center; justify-items: center; text-align: center; color: var(--muted); }
+.empty p { margin: 0 0 11px; }
+.retry { background: #274236; border: 1px solid #567263; border-radius: 7px; padding: 6px 10px; }
+.retry:hover { background: #345345; }
+
+footer {
+  flex: 0 0 38px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 11px;
+}
+.source { background: none; border: 0; padding: 4px 0; text-align: left; }
+.source:hover { color: #f4dba7; }
+.external { margin-left: 4px; color: var(--dim); }
+.status { white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+.status i { width: 6px; height: 6px; border-radius: 50%; background: #cca46f; }
+.status[data-source="live"] i { background: #a8d6b5; }
