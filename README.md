@@ -2,6 +2,8 @@
 
 Ein verschiebbares Desktop-Widget für Windows und macOS. Es zeigt die heutigen Gebets- und Jama’ah-Zeiten für Hannover, markiert das aktuelle Gebet dezent und zählt bis zum nächsten herunter.
 
+[**Widget für Windows oder macOS herunterladen**](https://github.com/BinSayajin/gebetszeiten-hannover/releases/latest)
+
 ## Installieren und benutzen
 
 - **Windows x64** – Setup-EXE öffnen und anschließend **Gebetszeiten Hannover** über die Desktop-Verknüpfung oder das Startmenü starten.
