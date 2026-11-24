@@ -4,6 +4,7 @@ const CLOCK_TIME = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
 const API_TIME = /^(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/;
 
 const PRAYERS = [
+  { id: 'imsak', name: 'Imsak' },
   { id: 'fajr', name: 'Fajr' },
   { id: 'shuruq', name: 'Schuruq', detail: 'Sonnenaufgang' },
   { id: 'thuhr', name: 'Thuhr' },
@@ -48,10 +49,11 @@ function berlinTimestamp(day, time) {
 }
 
 function hasMainTimes(begins) {
-  const { fajr, shuruq, thuhr, asr, asr1, asr2, maghrib, isha, haraj } = begins;
+  const { imsak, fajr, shuruq, thuhr, asr, asr1, asr2, maghrib, isha, haraj } = begins;
   const afternoon = [asr, asr1, asr2].filter(Boolean);
   return fajr && shuruq && thuhr && maghrib && (isha || haraj) && afternoon.length > 0
     && fajr < shuruq && shuruq < thuhr && afternoon.every(time => thuhr < time && time < maghrib)
+    && (!imsak || imsak <= fajr)
     && (!asr1 || !asr2 || asr1 <= asr2)
     && [isha, haraj].filter(Boolean).every(time => time >= maghrib || time < '04:00');
 }
@@ -141,4 +143,4 @@ function widgetState(now, lookup, method) {
   };
 }
 
-module.exports = { dateKey, decodeLiveDay, verifySchedule, widgetState };
+module.exports = { TIME_ZONE, dateKey, shiftDay, decodeLiveDay, verifySchedule, widgetState };
